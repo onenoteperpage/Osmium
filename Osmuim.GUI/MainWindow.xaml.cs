@@ -1,54 +1,120 @@
-﻿using Osmuim.GUI.Models;
-using Osmuim.GUI.Services;
-using System;
-using System.Collections.Generic;
+﻿using Osmuim.GUI.Services;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
+using Osmuim.GUI.Models;
+using Osmuim.GUI.Helpers;
+using System;
 
 namespace Osmuim.GUI
 {
     public partial class MainWindow : Window
     {
-        private readonly ChromeDataService chromeDataService = new ChromeDataService();
+        private readonly ChromeDataService _chromeDataService;
+
         private const string ChromeDataUrl = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json";
         private string currentOsmiumFilePath;
 
-        public MainWindow()
+        // this will be used throughout once it's setup
+        private ChromeForTesting chromeForTestingData;
+        private bool chromeForTestingDataLoaded = false;
+
+        public MainWindow(ChromeDataService chromeDataService)
         {
             InitializeComponent();
+            _chromeDataService = chromeDataService;
         }
 
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            // Example lists of versions (replace with actual data retrieval logic)
-            var firefoxVersions = new List<string> { "Firefox 89.0", "Firefox 88.0", "Firefox 87.0" };
-            var edgeVersions = new List<string> { "Edge 91.0", "Edge 90.0", "Edge 89.0" };
-            var chromeVersions = new List<string> { "Chrome 91.0", "Chrome 90.0", "Chrome 89.0" };
+            chromeForTestingData = await _chromeDataService.FetchChromeDataAsync(ChromeDataUrl);
 
-            // Populate the TextBoxes with the list content, joined by newline
-            FirefoxVersionsTextBox.Text = string.Join(Environment.NewLine, firefoxVersions);
-            EdgeVersionsTextBox.Text = string.Join(Environment.NewLine, edgeVersions);
-            ChromeVersionsTextBox.Text = string.Join(Environment.NewLine, chromeVersions);
+            // Get the latest Chrome versions and extract version strings
+            var chromeVersions = (await _chromeDataService.GetLatestVersionsAsync(chromeForTestingData, 10))
+                                 .Select(versionInfo => versionInfo.Version.ToString())
+                                 .ToList();
+
+            // Update the ComboBox with the list of versions
+            ChromeVersionsDropdown.ItemsSource = chromeVersions;
+            ChromeVersionsDropdown.SelectedIndex = 0;
+
+            // Allow UI to refresh
+            await Task.Yield();
+
+            // Update it's loaded
+            chromeForTestingDataLoaded = true;
 
             // Update status bar
             StatusBarText.Text = "Installed versions refreshed.";
         }
 
 
+
+        //private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var chromeData = await _chromeDataService.FetchChromeDataAsync(ChromeDataUrl);
+
+        //    // Get the latest Chrome versions and extract version strings
+        //    var chromeVersions = (await _chromeDataService.GetLatestVersionsAsync(chromeData, 10))
+        //                         .Select(versionInfo => versionInfo.Version.ToString())
+        //                         .ToList();
+
+        //    // Display versions in the TextBox, each on a new line
+        //    ChromeVersionsTextBox.Text = string.Join(Environment.NewLine, chromeVersions);
+
+        //    // Update status bar
+        //    StatusBarText.Text = "Installed versions refreshed.";
+        //}
+
+
+
         // First Tab: Install Chrome Version Button
-        private void InstallChromeButton_Click(object sender, RoutedEventArgs e)
+        private async void InstallChromeButton_Click(object sender, RoutedEventArgs e)
         {
-            // Placeholder logic to install selected Chrome version.
-            string selectedVersion = ChromeVersionsDropdown.SelectedItem?.ToString();
-            if (selectedVersion != null)
+            if (!chromeForTestingDataLoaded || ChromeVersionsDropdown.SelectedItem == null)
             {
-                StatusBarText.Text = $"Installing Chrome {selectedVersion}...";
-                // Trigger install logic
+                StatusBarText.Text = "Please refresh versions and select a version to install.";
+                return;
             }
+
+            string selectedVersion = ChromeVersionsDropdown.SelectedItem.ToString();
+            var selectedVersionInfo = chromeForTestingData.Versions.FirstOrDefault(v => v.Version == selectedVersion);
+
+            if (selectedVersionInfo == null)
+            {
+                StatusBarText.Text = "Selected version not found.";
+                return;
+            }
+
+            string platform = Environment.Is64BitOperatingSystem ? "win64" : "win32";
+            var urls = await DownloadHelper.GetDownloadUrlsByPlatformAsync(selectedVersionInfo, platform);
+
+            if (urls.Count == 0)
+            {
+                StatusBarText.Text = $"No downloads available for {platform}.";
+                return;
+            }
+
+            // Set up temporary download folder and target extraction folder
+            string tempDir = Path.Combine(Path.GetTempPath(), "ChromeDownloadTemp");
+            string targetDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Download and extract files
+            StatusBarText.Text = $"Downloading Chrome {selectedVersion}...";
+            await DownloadHelper.DownloadFilesAsync(urls, tempDir);
+
+            StatusBarText.Text = $"Installing Chrome {selectedVersion}...";
+            ExtractionHelper.ExtractFiles(tempDir, targetDir, selectedVersion);
+
+            // Clean up
+            Directory.Delete(tempDir, true);
+
+            StatusBarText.Text = $"Chrome {selectedVersion} installation complete.";
         }
+
+
 
         // First Tab: Install Edge Version Button
         private void InstallEdgeButton_Click(object sender, RoutedEventArgs e)

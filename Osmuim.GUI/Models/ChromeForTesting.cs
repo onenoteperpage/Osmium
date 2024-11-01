@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Osmuim.GUI.Models
 {
-    internal class ChromeForTesting
+    public class ChromeForTesting
     {
         [JsonPropertyName("timestamp")]
         public DateTime Timestamp { get; set; }

@@ -27,7 +27,7 @@
                         <!-- Chrome Dropdown -->
                         <StackPanel Margin="10,0,0,0">
                             <TextBlock Text="Chrome" />
-                            <ComboBox Name="ChromeVersionsDropdown" Width="150" />
+                            <ComboBox x:Name="ChromeVersionsDropdown" Width="150" />
                             <Button Content="Install" Name="InstallChromeButton" Click="InstallChromeButton_Click" Margin="0,10,0,0" />
                         </StackPanel>
 
