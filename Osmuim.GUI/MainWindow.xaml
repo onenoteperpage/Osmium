@@ -1,0 +1,160 @@
+﻿<Window x:Class="Osmuim.GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Osmuim GUI" Height="450" Width="800">
+
+    <DockPanel LastChildFill="True">
+        <!-- Tab Control -->
+        <TabControl DockPanel.Dock="Top">
+
+            <!-- First Tab: Installed Browsers -->
+            <TabItem Header="Installed Browsers">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <!-- Controls row -->
+                        <RowDefinition Height="*" />
+                        <!-- TextBox display row filling remaining space -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Control Panel with Buttons and Dropdowns -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
+                        <Button Content="Refresh" Name="RefreshButton" Click="RefreshButton_Click" />
+
+                        <!-- Chrome Dropdown -->
+                        <StackPanel Margin="10,0,0,0">
+                            <TextBlock Text="Chrome" />
+                            <ComboBox Name="ChromeVersionsDropdown" Width="150" />
+                            <Button Content="Install" Name="InstallChromeButton" Click="InstallChromeButton_Click" Margin="0,10,0,0" />
+                        </StackPanel>
+
+                        <!-- Edge Dropdown -->
+                        <StackPanel Margin="10,0,0,0">
+                            <TextBlock Text="Edge" />
+                            <ComboBox Name="EdgeVersionsDropdown" Width="150" />
+                            <Button Content="Install" Name="InstallEdgeButton" Click="InstallEdgeButton_Click" Margin="0,10,0,0" />
+                        </StackPanel>
+
+                        <!-- Firefox Dropdown -->
+                        <StackPanel Margin="10,0,0,0">
+                            <TextBlock Text="Firefox" />
+                            <ComboBox Name="FirefoxVersionsDropdown" Width="150" />
+                            <Button Content="Install" Name="InstallFirefoxButton" Click="InstallFirefoxButton_Click" Margin="0,10,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Scrollable TextBoxes of installed versions filling vertical space -->
+                    <Grid Grid.Row="1" Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <!-- Firefox Column -->
+                            <ColumnDefinition Width="*" />
+                            <!-- Edge Column -->
+                            <ColumnDefinition Width="*" />
+                            <!-- Chrome Column -->
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Chrome Versions TextBox -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Stretch" Margin="0,0,10,0">
+                            <TextBlock Text="Chrome Installed Versions" FontWeight="Bold" Margin="0,0,0,5" />
+                            <TextBox x:Name="ChromeVersionsTextBox" Height="230" VerticalScrollBarVisibility="Auto" 
+                                     IsReadOnly="True" AcceptsReturn="True" />
+                        </StackPanel>
+
+                        <!-- Edge Versions TextBox -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Stretch" Margin="0,0,10,0">
+                            <TextBlock Text="Edge Installed Versions" FontWeight="Bold" Margin="0,0,0,5" />
+                            <TextBox x:Name="EdgeVersionsTextBox" Height="230" VerticalScrollBarVisibility="Auto" 
+                                     IsReadOnly="True" AcceptsReturn="True" />
+                        </StackPanel>
+
+                        <!-- Firefox Versions TextBox -->
+                        <StackPanel Grid.Column="2" VerticalAlignment="Stretch">
+                            <TextBlock Text="Firefox Installed Versions" FontWeight="Bold" Margin="0,0,0,5" />
+                            <TextBox x:Name="FirefoxVersionsTextBox" Height="230" VerticalScrollBarVisibility="Auto" 
+                                     IsReadOnly="True" AcceptsReturn="True" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="File Editor">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <!-- Fill available space for TextBox -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Fixed height for button controls -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Scrollable TextBox for displaying file contents -->
+                    <TextBox Name="FileContentTextBox" 
+                 AcceptsReturn="True" 
+                 VerticalScrollBarVisibility="Auto" 
+                 HorizontalScrollBarVisibility="Auto" 
+                 Grid.Row="0" 
+                 Margin="10" 
+                 Height="300" />
+                    <!-- Set larger height -->
+
+                    <!-- File Control Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="1" Margin="10">
+                        <Button Content="Open File" Name="OpenFileButton" Click="OpenFileButton_Click" />
+                        <Button Content="Save File" Name="SaveFileButton" Click="SaveFileButton_Click" Margin="10,0,0,0"/>
+                        <Button Content="New File" Name="NewFileButton" Click="NewFileButton_Click" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+
+            <!-- Execute Tab -->
+            <TabItem Header="Execute">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Save Results Checkbox and Directory Selection -->
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                            <TextBlock Text="Results Directory:" VerticalAlignment="Center" />
+                            <TextBox Name="DirectoryPathTextBox" IsReadOnly="True" Width="250" Margin="5,0,0,0" />
+                            <Button Content="Set Directory" Name="SetDirectoryButton" Click="SetDirectoryButton_Click" Margin="5,0,0,0"/>
+                        </StackPanel>
+                        <CheckBox Content="Save Results" Name="SaveResultsCheckBox" Margin="0,0,10,0"/>
+                    </StackPanel>
+
+                    <!-- Browser and Version Selection -->
+                    <StackPanel Orientation="Horizontal" Margin="10" Grid.Row="1">
+                        <TextBlock Text="Browser:" VerticalAlignment="Center" />
+                        <ComboBox Name="BrowserSelectionDropdown" Width="150" Margin="5,0,10,0" />
+
+                        <TextBlock Text="Version:" VerticalAlignment="Center" />
+                        <ComboBox Name="BrowserVersionDropdown" Width="150" Margin="5,0,10,0" />
+
+                        <Button Content="Execute" Name="ExecuteButton" Click="ExecuteButton_Click" Width="80" Margin="60,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- Execution and Output Display -->
+                    <StackPanel Margin="10" Grid.Row="2">
+                        
+                        <TextBox Name="ExecutionOutputTextBox" IsReadOnly="True" AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
+                                 Margin="0,10,0,0" Height="212" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StatusBar DockPanel.Dock="Bottom" Height="24" Padding="5,0">
+            <StatusBarItem>
+                <TextBlock Name="StatusBarText" Text="Ready" VerticalAlignment="Center" />
+            </StatusBarItem>
+        </StatusBar>
+    </DockPanel>
+</Window>
