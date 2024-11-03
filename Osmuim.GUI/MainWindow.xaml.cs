@@ -29,6 +29,8 @@ namespace Osmuim.GUI
         private List<string> firefoxVersionsInstalled = new List<string>();
         private List<string> edgeVersionsInstalled = new List<string>();
 
+        private List<string> browsersEnabled = new List<string>();
+
         public MainWindow(ChromeDataService chromeDataService)
         {
             InitializeComponent();
@@ -45,6 +47,21 @@ namespace Osmuim.GUI
             chromeVersionsInstalled = BrowserFolderChecker.GetBrowserVersions(browserVersions, "Chrome");
             firefoxVersionsInstalled = BrowserFolderChecker.GetBrowserVersions(browserVersions, "Firefox");
             edgeVersionsInstalled = BrowserFolderChecker.GetBrowserVersions(browserVersions, "Edge");
+
+            if (chromeVersionsInstalled.Count > 0)
+            {
+                browsersEnabled.Add("Chrome");
+            }
+            if (firefoxVersionsInstalled.Count > 0)
+            {
+                browsersEnabled.Add("Firefox");
+            }
+            if (edgeVersionsInstalled.Count > 0)
+            {
+                browsersEnabled.Add("Edge");
+            }
+
+            BrowserSelectionDropdown.ItemsSource = browsersEnabled;
 
             // Update TextBoxes with populated lists
             ChromeVersionsTextBox.Text = string.Join(Environment.NewLine, chromeVersionsInstalled);
@@ -155,8 +172,6 @@ namespace Osmuim.GUI
             // Directly call InitializeBrowserVersionsAsync to refresh UI
             await InitializeBrowserVersionsAsync();
         }
-
-
 
         // First Tab: Install Edge Version Button
         private void InstallEdgeButton_Click(object sender, RoutedEventArgs e)
@@ -297,6 +312,46 @@ namespace Osmuim.GUI
         {
             _progressWindow?.Complete();
             _progressWindow = null;
+        }
+
+        private void BrowserSelectionDropdown_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            // Check if a valid item is selected
+            if (BrowserSelectionDropdown.SelectedItem is string selectedBrowser && selectedBrowser == "Chrome")
+            {
+                // Do something when "Chrome" is selected
+                RefreshBrowserVersionDropdown(selectedBrowser);
+                BrowserVersionDropdown.SelectedIndex = -1;
+            }
+        }
+
+        private void BrowserVersionDropdown_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void RefreshBrowserVersionDropdown(string selectedBrowser)
+        {
+            switch (selectedBrowser)
+            {
+                case "Chrome":
+                    BrowserVersionDropdown.ItemsSource = chromeVersionsInstalled;
+                    break;
+                case "Firefox":
+                    BrowserVersionDropdown.ItemsSource = firefoxVersionsInstalled;
+                    break;
+                case "Edge":
+                    BrowserVersionDropdown.ItemsSource = edgeVersionsInstalled;
+                    break;
+            }
+        }
+
+        private void ClearExecuteTabSettings_Click(object sender, RoutedEventArgs e)
+        {
+            DirectoryPathTextBox.Text = null;
+            SaveResultsCheckBox.IsChecked = false;
+            BrowserVersionDropdown.SelectedIndex = -1;
+            BrowserSelectionDropdown.SelectedIndex = -1;
         }
     }
 }

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Osmuim GUI" Height="450" Width="800">
+        Title="Osmuim GUI" Height="460" Width="800">
 
     <DockPanel LastChildFill="True">
         <!-- Tab Control -->
@@ -60,27 +60,28 @@
                         <!-- Chrome Versions TextBox -->
                         <StackPanel Grid.Column="0" VerticalAlignment="Stretch" Margin="0,0,10,0">
                             <TextBlock Text="Chrome Installed Versions" FontWeight="Bold" Margin="0,0,0,5" />
-                            <TextBox x:Name="ChromeVersionsTextBox" Height="230" VerticalScrollBarVisibility="Auto" 
+                            <TextBox x:Name="ChromeVersionsTextBox" Height="239" VerticalScrollBarVisibility="Auto" 
                                      IsReadOnly="True" AcceptsReturn="True" />
                         </StackPanel>
 
                         <!-- Edge Versions TextBox -->
                         <StackPanel Grid.Column="1" VerticalAlignment="Stretch" Margin="0,0,10,0">
                             <TextBlock Text="Edge Installed Versions" FontWeight="Bold" Margin="0,0,0,5" />
-                            <TextBox x:Name="EdgeVersionsTextBox" Height="230" VerticalScrollBarVisibility="Auto" 
+                            <TextBox x:Name="EdgeVersionsTextBox" Height="239" VerticalScrollBarVisibility="Auto" 
                                      IsReadOnly="True" AcceptsReturn="True" />
                         </StackPanel>
 
                         <!-- Firefox Versions TextBox -->
                         <StackPanel Grid.Column="2" VerticalAlignment="Stretch">
                             <TextBlock Text="Firefox Installed Versions" FontWeight="Bold" Margin="0,0,0,5" />
-                            <TextBox x:Name="FirefoxVersionsTextBox" Height="230" VerticalScrollBarVisibility="Auto" 
+                            <TextBox x:Name="FirefoxVersionsTextBox" Height="239" VerticalScrollBarVisibility="Auto" 
                                      IsReadOnly="True" AcceptsReturn="True" />
                         </StackPanel>
                     </Grid>
                 </Grid>
             </TabItem>
 
+            <!-- Second Tab: File Editor -->
             <TabItem Header="File Editor">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -92,12 +93,12 @@
 
                     <!-- Scrollable TextBox for displaying file contents -->
                     <TextBox Name="FileContentTextBox" 
-                 AcceptsReturn="True" 
-                 VerticalScrollBarVisibility="Auto" 
-                 HorizontalScrollBarVisibility="Auto" 
-                 Grid.Row="0" 
-                 Margin="10" 
-                 Height="300" />
+                             AcceptsReturn="True" 
+                             VerticalScrollBarVisibility="Auto" 
+                             HorizontalScrollBarVisibility="Auto" 
+                             Grid.Row="0" 
+                             Margin="10" 
+                             Height="308" />
                     <!-- Set larger height -->
 
                     <!-- File Control Buttons -->
@@ -109,8 +110,7 @@
                 </Grid>
             </TabItem>
 
-
-            <!-- Execute Tab -->
+            <!-- Third Tab: Execute Script -->
             <TabItem Header="Execute">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -123,19 +123,21 @@
                     <StackPanel Orientation="Vertical" Margin="10">
                         <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
                             <TextBlock Text="Results Directory:" VerticalAlignment="Center" />
-                            <TextBox Name="DirectoryPathTextBox" IsReadOnly="True" Width="250" Margin="5,0,0,0" />
-                            <Button Content="Set Directory" Name="SetDirectoryButton" Click="SetDirectoryButton_Click" Margin="5,0,0,0"/>
+                            <TextBox x:Name="DirectoryPathTextBox" IsReadOnly="True" Width="250" Margin="5,0,0,0" />
+                            <Button Content="Set Directory" Name="SetDirectoryButton" Click="SetDirectoryButton_Click" Margin="5,0,0,0" Padding="4"/>
                         </StackPanel>
-                        <CheckBox Content="Save Results" Name="SaveResultsCheckBox" Margin="0,0,10,0"/>
+                        <CheckBox Content="Save Results" x:Name="SaveResultsCheckBox" Margin="0,0,10,0"/>
                     </StackPanel>
 
                     <!-- Browser and Version Selection -->
                     <StackPanel Orientation="Horizontal" Margin="10" Grid.Row="1">
                         <TextBlock Text="Browser:" VerticalAlignment="Center" />
-                        <ComboBox Name="BrowserSelectionDropdown" Width="150" Margin="5,0,10,0" />
+                        <ComboBox x:Name="BrowserSelectionDropdown" SelectionChanged="BrowserSelectionDropdown_SelectionChanged" Width="150" Margin="5,0,10,0" />
 
                         <TextBlock Text="Version:" VerticalAlignment="Center" />
-                        <ComboBox Name="BrowserVersionDropdown" Width="150" Margin="5,0,10,0" />
+                        <ComboBox x:Name="BrowserVersionDropdown" SelectionChanged="BrowserVersionDropdown_SelectionChanged" Width="150" Margin="5,0,10,0" Padding="4" />
+
+                        <Button x:Name="ClearExecuteTabSettings" Content="Clear Settings" Click="ClearExecuteTabSettings_Click" Margin="20,0,0,0" Padding="4"/>
 
                         <Button Content="Execute" Name="ExecuteButton" Click="ExecuteButton_Click" Width="80" Margin="60,0,0,0"/>
                     </StackPanel>
@@ -145,7 +147,7 @@
                         
                         <TextBox Name="ExecutionOutputTextBox" IsReadOnly="True" AcceptsReturn="True"
                                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
-                                 Margin="0,10,0,0" Height="212" />
+                                 Margin="0,10,0,0" Height="211" />
                     </StackPanel>
                 </Grid>
             </TabItem>
