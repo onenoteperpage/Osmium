@@ -10,7 +10,29 @@ namespace Osmuim.GUI.Helpers
 {
     public static class DownloadHelper
     {
+
         public static async Task<List<string>> GetDownloadUrlsByPlatformAsync(VersionInfo versionInfo, string platform)
+        {
+            var urls = new List<string>();
+
+            // Simulate asynchronous processing with Task.Run (optional, can be removed if unnecessary)
+            await Task.Run(() =>
+            {
+                // Get URLs for the specified platform from each download type
+                var chromeUrl = versionInfo.Downloads.Chrome.FirstOrDefault(d => d.Platform == platform)?.Url;
+                if (chromeUrl != null) urls.Add(chromeUrl);
+
+                var chromedriverUrl = versionInfo.Downloads.Chromedriver.FirstOrDefault(d => d.Platform == platform)?.Url;
+                if (chromedriverUrl != null) urls.Add(chromedriverUrl);
+
+                var chromeHeadlessShellUrl = versionInfo.Downloads.ChromeHeadlessShell.FirstOrDefault(d => d.Platform == platform)?.Url;
+                if (chromeHeadlessShellUrl != null) urls.Add(chromeHeadlessShellUrl);
+            });
+
+            return urls;
+        }
+
+        public static List<string> GetDownloadUrlsByPlatform(VersionInfo versionInfo, string platform)
         {
             var urls = new List<string>();
 

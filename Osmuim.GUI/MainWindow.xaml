@@ -49,12 +49,12 @@
                     <!-- Scrollable TextBoxes of installed versions filling vertical space -->
                     <Grid Grid.Row="1" Margin="10">
                         <Grid.ColumnDefinitions>
+                            <!-- Chrome Column -->
                             <ColumnDefinition Width="*" />
                             <!-- Firefox Column -->
                             <ColumnDefinition Width="*" />
                             <!-- Edge Column -->
                             <ColumnDefinition Width="*" />
-                            <!-- Chrome Column -->
                         </Grid.ColumnDefinitions>
 
                         <!-- Chrome Versions TextBox -->

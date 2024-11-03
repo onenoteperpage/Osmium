@@ -1,18 +1,22 @@
-﻿using Osmuim.GUI.Services;
+﻿using Osmuim.GUI.Models;
+using Osmuim.GUI.Helpers;
+using Osmuim.GUI.Services;
+using Osmuim.GUI.Views;
+using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Win32;
-using Osmuim.GUI.Models;
-using Osmuim.GUI.Helpers;
-using System;
 
 namespace Osmuim.GUI
 {
     public partial class MainWindow : Window
     {
         private readonly ChromeDataService _chromeDataService;
+
+        private ProgressWindow _progressWindow;
 
         private const string ChromeDataUrl = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json";
         private string currentOsmiumFilePath;
@@ -21,10 +25,31 @@ namespace Osmuim.GUI
         private ChromeForTesting chromeForTestingData;
         private bool chromeForTestingDataLoaded = false;
 
+        private List<string> chromeVersionsInstalled = new List<string>();
+        private List<string> firefoxVersionsInstalled = new List<string>();
+        private List<string> edgeVersionsInstalled = new List<string>();
+
         public MainWindow(ChromeDataService chromeDataService)
         {
             InitializeComponent();
             _chromeDataService = chromeDataService;
+
+            // Start async initialization after construction
+            Loaded += async (s, e) => await InitializeBrowserVersionsAsync();
+        }
+
+        private async Task InitializeBrowserVersionsAsync()
+        {
+            // Load installed versions of each browser asynchronously
+            var browserVersions = await BrowserFolderChecker.GetBrowserVersionFoldersAsync();
+            chromeVersionsInstalled = BrowserFolderChecker.GetBrowserVersions(browserVersions, "Chrome");
+            firefoxVersionsInstalled = BrowserFolderChecker.GetBrowserVersions(browserVersions, "Firefox");
+            edgeVersionsInstalled = BrowserFolderChecker.GetBrowserVersions(browserVersions, "Edge");
+
+            // Update TextBoxes with populated lists
+            ChromeVersionsTextBox.Text = string.Join(Environment.NewLine, chromeVersionsInstalled);
+            FirefoxVersionsTextBox.Text = string.Join(Environment.NewLine, firefoxVersionsInstalled);
+            EdgeVersionsTextBox.Text = string.Join(Environment.NewLine, edgeVersionsInstalled);
         }
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -50,8 +75,6 @@ namespace Osmuim.GUI
             StatusBarText.Text = "Installed versions refreshed.";
         }
 
-
-
         //private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         //{
         //    var chromeData = await _chromeDataService.FetchChromeDataAsync(ChromeDataUrl);
@@ -67,8 +90,6 @@ namespace Osmuim.GUI
         //    // Update status bar
         //    StatusBarText.Text = "Installed versions refreshed.";
         //}
-
-
 
         // First Tab: Install Chrome Version Button
         private async void InstallChromeButton_Click(object sender, RoutedEventArgs e)
@@ -97,21 +118,42 @@ namespace Osmuim.GUI
                 return;
             }
 
+            var steps = new List<string>
+            {
+                $"Downloading Chrome {selectedVersion}...",
+                $"Installing Chrome {selectedVersion}...",
+                $"Chrome {selectedVersion} installation complete."
+            };
+            int stepsI = 0;
+
+            // Show the progress window with the total steps
+            ShowProgressWindow(steps.Count);
+
             // Set up temporary download folder and target extraction folder
             string tempDir = Path.Combine(Path.GetTempPath(), "ChromeDownloadTemp");
             string targetDir = AppDomain.CurrentDomain.BaseDirectory;
 
             // Download and extract files
-            StatusBarText.Text = $"Downloading Chrome {selectedVersion}...";
+            StatusBarText.Text = steps[stepsI];
+            UpdateProgressWindow(++stepsI, steps[stepsI - 1]);
             await DownloadHelper.DownloadFilesAsync(urls, tempDir);
 
-            StatusBarText.Text = $"Installing Chrome {selectedVersion}...";
+            StatusBarText.Text = steps[stepsI];
+            UpdateProgressWindow(++stepsI, steps[stepsI - 1]);
             ExtractionHelper.ExtractFiles(tempDir, targetDir, selectedVersion);
+            await Task.Delay(1000);
 
             // Clean up
             Directory.Delete(tempDir, true);
 
-            StatusBarText.Text = $"Chrome {selectedVersion} installation complete.";
+            StatusBarText.Text = steps[stepsI];
+            UpdateProgressWindow(++stepsI, steps[stepsI - 1]);
+            await Task.Delay(1000);
+
+            CloseProgressWindow();
+
+            // Directly call InitializeBrowserVersionsAsync to refresh UI
+            await InitializeBrowserVersionsAsync();
         }
 
 
@@ -229,6 +271,32 @@ namespace Osmuim.GUI
                     StatusBarText.Text = "Execution completed.";
                 });
             });
+        }
+
+        // Shows the progress window with the total steps
+        public void ShowProgressWindow(int totalSteps)
+        {
+            // Initialize the ProgressWindow
+            _progressWindow = new ProgressWindow
+            {
+                Owner = this // Set owner to block interaction with the main window
+            };
+
+            _progressWindow.SetTotalSteps(totalSteps);
+            _progressWindow.Show();
+        }
+
+        // Updates the progress window with the current step and text
+        public void UpdateProgressWindow(int currentStep, string stepText)
+        {
+            _progressWindow?.UpdateProgress(currentStep, stepText);
+        }
+
+        // Closes the progress window
+        public void CloseProgressWindow()
+        {
+            _progressWindow?.Complete();
+            _progressWindow = null;
         }
     }
 }

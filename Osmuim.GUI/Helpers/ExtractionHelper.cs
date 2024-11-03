@@ -13,11 +13,12 @@ namespace Osmuim.GUI.Helpers
 
             foreach (var zipFilePath in Directory.GetFiles(sourceFolder, "*.zip"))
             {
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(zipFilePath);
-                string extractPath = Path.Combine(extractDir, fileNameWithoutExtension);
+                //string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(zipFilePath);
+                //string extractPath = Path.Combine(extractDir, fileNameWithoutExtension);
 
-                Directory.CreateDirectory(extractPath);
-                ZipFile.ExtractToDirectory(zipFilePath, extractPath);
+                //Directory.CreateDirectory(extractPath);
+                //ZipFile.ExtractToDirectory(zipFilePath, extractPath);
+                ZipFile.ExtractToDirectory(zipFilePath, extractDir);
             }
         }
     }
